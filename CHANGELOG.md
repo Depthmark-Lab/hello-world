@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/Depthmark-Lab/hello-world/compare/v1.0.0...v1.1.0) (2026-03-29)
+
+
+### Features
+
+* Feature/new feature ([230a1bc](https://github.com/Depthmark-Lab/hello-world/commit/230a1bc02b72dc0d8b3d9e6b1b254507679f7096))
+* new feature ([0dba44f](https://github.com/Depthmark-Lab/hello-world/commit/0dba44f727ddcdacf9daa352113ab2f88c172854))
+
 ## 1.0.0 (2026-03-29)
 
 
