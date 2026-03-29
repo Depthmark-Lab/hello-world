@@ -2,18 +2,8 @@
 name: Release
 
 on:
-  workflow_call:
-    inputs:
-      tag_name:
-        description: "Release tag (e.g., v1.2.3)"
-        required: true
-        type: string
-  workflow_dispatch:
-    inputs:
-      tag_name:
-        description: "Release tag (e.g., v1.2.3)"
-        required: true
-        type: string
+  push:
+    tags: ['v*']
 
 permissions: {}
 
@@ -33,7 +23,7 @@ jobs:
   docker:
     name: Docker
     needs: [ci]
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted', 'talos']
     environment: release
     permissions:
       contents: read
