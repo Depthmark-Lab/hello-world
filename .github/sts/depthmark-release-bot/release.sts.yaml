@@ -6,5 +6,4 @@ claim_pattern:
   
 permissions:
   contents: write
-  metadata: write
   checks: write
