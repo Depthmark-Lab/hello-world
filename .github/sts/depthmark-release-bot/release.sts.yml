@@ -1,9 +1,6 @@
 issuer: https://token.actions.githubusercontent.com
 subject: "repo:Depthmark-Lab/hello-world:ref:refs/heads/main"
 
-claim_pattern:
-  workflow_ref: "Depthmark-Lab/hello-world/.github/workflows/release-please.yml@refs/heads/main"
-  
 permissions:
   contents: write
   metadata: write
