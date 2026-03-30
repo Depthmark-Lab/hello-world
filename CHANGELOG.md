@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/Depthmark-Lab/hello-world/compare/v1.2.0...v1.2.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* docker build ([32de976](https://github.com/Depthmark-Lab/hello-world/commit/32de976cc57aff9353b77419021ee5d8d620ab72))
+* docker build ([04a37ce](https://github.com/Depthmark-Lab/hello-world/commit/04a37cefd456712530d504168268e1c268035c79))
+
 ## [1.2.0](https://github.com/Depthmark-Lab/hello-world/compare/v1.1.0...v1.2.0) (2026-03-30)
 
 
