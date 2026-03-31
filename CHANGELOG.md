@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/Depthmark-Lab/hello-world/compare/v1.3.0...v1.3.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* remove docker build cache ([62496a2](https://github.com/Depthmark-Lab/hello-world/commit/62496a2b565c4a3151884c75f6f3f4bd69ecdf08))
+* remove docker build cache ([8488301](https://github.com/Depthmark-Lab/hello-world/commit/84883016a8b29ba27dec511d19d121cc64047871))
+
 ## [1.3.0](https://github.com/Depthmark-Lab/hello-world/compare/v1.2.1...v1.3.0) (2026-03-31)
 
 

@@ -28,7 +28,7 @@ FROM gcr.io/distroless/static-debian12:nonroot
 LABEL maintainer="Alexandre Delisle <oss@adelisle.com>"
 LABEL description="Hello World"
 # x-release-please-start-version
-LABEL version="1.3.0"
+LABEL version="1.3.1"
 # x-release-please-end
 
 # Copy the static binary from builder
