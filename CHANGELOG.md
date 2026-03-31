@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/Depthmark-Lab/hello-world/compare/v1.2.1...v1.3.0) (2026-03-31)
+
+
+### Features
+
+* commit ([a7b0b12](https://github.com/Depthmark-Lab/hello-world/commit/a7b0b127a30a3e14318fb4cd1cb727501cb3e99b))
+* commit ([437fe5e](https://github.com/Depthmark-Lab/hello-world/commit/437fe5e8a56bd1f957fb33607a507ff098eed112))
+
 ## [1.2.1](https://github.com/Depthmark-Lab/hello-world/compare/v1.2.0...v1.2.1) (2026-03-30)
 
 
