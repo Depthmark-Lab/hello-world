@@ -1,9 +1,18 @@
 ---
+# Builds, pushes, signs and attests the image of a release. Called by
+# release-please.yml on main once it has created the release's tag: a tag push
+# does not start it, so its jobs always run as release.yml@refs/heads/main, the
+# ref the Talos runner group admits. The docker job waits for approval in the
+# environment release, which only main may deploy to.
 name: Release
 
 on:
-  push:
-    tags: ['v*']
+  workflow_call:
+    inputs:
+      tag_name:
+        description: The tag release-please created, such as v1.3.2
+        required: true
+        type: string
 
 permissions: {}
 
@@ -34,7 +43,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     env:
       REGISTRY: ghcr.io
-      TAG_NAME: ${{ inputs.tag_name || github.ref_name }}
+      TAG_NAME: ${{ inputs.tag_name }}
     steps:
       - name: Lowercase image name
         run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
@@ -45,10 +54,15 @@ jobs:
           ref: ${{ env.TAG_NAME }}
           persist-credentials: false
 
+      # The tag travels as an environment variable, never interpolated into the script.
       - name: Compute version
         id: version
         run: |
-          TAG="${{ env.TAG_NAME }}"
+          TAG="$TAG_NAME"
+          if ! [[ $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag_name must look like v1.2.3"
+            exit 1
+          fi
           VERSION="${TAG#v}"
           MAJOR="${VERSION%%.*}"
           MINOR="${VERSION#*.}"

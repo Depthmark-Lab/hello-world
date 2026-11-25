@@ -1,4 +1,11 @@
 ---
+# Release Please: opens the release pull request from conventional commits, and
+# when that pull request is merged, creates the tag and the GitHub release, then
+# calls release.yml for it. Both run from main only: the Talos runner group
+# admits release-please.yml and release.yml at refs/heads/main and nothing else
+# of this repository, so the release reaches the internal services and a tag,
+# a branch or a fork cannot. The release job waits for approval (environment
+# release).
 name: Release Please
 
 on:
@@ -21,7 +28,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: Depthmark/github-sts-action@main
+      - uses: Depthmark/github-sts-action@9014c80f47cad81e0a1295b112714d5c1b219d54 # v0.3.0
         id: sts
         with:
           sts-url: https://github-sts-dev.adelisle.com
@@ -35,3 +42,16 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           token: ${{ steps.sts.outputs.token }}
+
+  release:
+    name: Release
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    uses: ./.github/workflows/release.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    with:
+      tag_name: ${{ needs.release-please.outputs.tag_name }}
