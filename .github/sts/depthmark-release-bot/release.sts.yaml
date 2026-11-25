@@ -1,9 +1,23 @@
+# The token release-please.yml gets from the dev broker (github-sts-dev.adelisle.com),
+# App depthmark-release-bot, to open release pull requests and create releases.
+# For this repository only, from release-please.yml on main.
+#
+# The broker reads this file from the default branch, and requires the immutable
+# OIDC subject (owner and repository ids), which this repository opted in to: the
+# name-only subject repo:Depthmark-Lab/hello-world:... is refused as
+# github_identity_immutable_subject_required.
 issuer: https://token.actions.githubusercontent.com
-subject: "repo:Depthmark-Lab/hello-world:ref:refs/heads/main"
-
+subject: "repo:Depthmark-Lab@71595780/hello-world@1195272384:ref:refs/heads/main"
 claim_pattern:
-  workflow_ref: "Depthmark-Lab/hello-world/.github/workflows/release-please.yml@refs/heads/main"
-  
+  job_workflow_ref: '^Depthmark-Lab/hello-world/\.github/workflows/release-please\.yml@refs/heads/main$'
+audience: github-sts
+github:
+  sources:
+    - owner_id: "71595780"
+      repository_id: "1195272384"
+  target:
+    owner_id: "71595780"
+    repository_id: "1195272384"
 permissions:
   contents: write
   checks: write
