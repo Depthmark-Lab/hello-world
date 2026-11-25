@@ -55,6 +55,8 @@ jobs:
           go-version-file: go.mod
 
       - name: Run tests
+        # bash, not the default bash -e: pipefail keeps tee from hiding a failing test.
+        shell: bash
         run: go test -race -coverprofile=coverage.out -v ./... 2>&1 | tee test-output.txt
 
       - name: Upload test results
