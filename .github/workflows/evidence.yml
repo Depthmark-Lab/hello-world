@@ -13,10 +13,12 @@
 # iterated on, that ref is its branch feature/external-consumer, which Vault
 # trusts for now: re-run this workflow after each push there. A release tag later.
 #
-# Only the platform's jobs run on the lab's Talos runners, in the homelab: the
-# runner group admits the platform's workflows at the refs it lists, nothing of
-# this repository. The build runs on GitHub's runners. Nothing here starts on a
-# pull request either: in a public repository, a fork could open one.
+# Only the platform's jobs run on the Talos runners, in the homelab, in the
+# runner group rg-talos: it admits the platform's workflows at the refs it lists,
+# nothing of this repository. Their labels match the lab's runners too, but
+# rg-talos-lab does not admit this repository. The build runs on GitHub's
+# runners. Nothing here starts on a pull request either: in a public repository,
+# a fork could open one.
 name: Evidence
 
 on:
@@ -98,6 +100,7 @@ jobs:
       type: ${{ matrix.type }}
       subject-repo-path: lab-artifacts/hello-world/${{ github.run_number }}/hello-world
       subject-artifact: hello-world-binary
+      runs-on: '["self-hosted", "talos"]'
 
   verify:
     name: Verify
@@ -110,3 +113,4 @@ jobs:
     with:
       subject-artifact: hello-world-binary
       types: provenance,provenance-attestation
+      runs-on: '["self-hosted", "talos"]'
