@@ -9,9 +9,9 @@
 #   verify    the platform's verify.yml: hashes the binary itself and verifies the
 #             envelopes about it with the trusted public keys only
 #
-# evidence.yml and verify.yml are called at the same ref. While the platform is
-# iterated on, that ref is its branch feature/external-consumer, which Vault
-# trusts for now: re-run this workflow after each push there. A release tag later.
+# evidence.yml and verify.yml are called at the same ref, the platform's main,
+# which Vault trusts: re-run this workflow after each merge there. A release tag
+# later.
 #
 # Only the platform's jobs run on the Talos runners, in the homelab, in the
 # runner group rg-talos: it admits the platform's workflows at the refs it lists,
@@ -88,7 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         type: [provenance, provenance-attestation]
-    uses: Depthmark-Lab/test-evidences/.github/workflows/evidence.yml@feature/external-consumer
+    uses: Depthmark-Lab/test-evidences/.github/workflows/evidence.yml@main
     # Everything any job of evidence.yml asks for: GitHub checks a called workflow's
     # permissions before any job runs, whichever type this call is for.
     permissions:
@@ -107,7 +107,7 @@ jobs:
     needs: [build, evidence]
     # Also when a type failed: verify then says which envelopes hold and which type is missing.
     if: ${{ !cancelled() && needs.build.result == 'success' }}
-    uses: Depthmark-Lab/test-evidences/.github/workflows/verify.yml@feature/external-consumer
+    uses: Depthmark-Lab/test-evidences/.github/workflows/verify.yml@main
     permissions:
       contents: read
     with:
