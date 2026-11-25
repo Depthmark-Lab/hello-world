@@ -1,0 +1,116 @@
+---
+# Signed evidence about the hello-world binary, from the evidence platform in
+# another repository, Depthmark-Lab/test-evidences:
+#   build     this repository's job: builds the static binary and hands it over.
+#             The platform only sees that one file, never this repository's code
+#   evidence  the platform's evidence.yml, once per evidence type: GitHub attests
+#             the binary's build provenance with Sigstore, and the platform records
+#             its own; both are signed with the platform's keys in Vault Transit
+#   verify    the platform's verify.yml: hashes the binary itself and verifies the
+#             envelopes about it with the trusted public keys only
+#
+# evidence.yml and verify.yml are called at the same ref. While the platform is
+# iterated on, that ref is its branch feature/external-consumer, which Vault
+# trusts for now: re-run this workflow after each push there. A release tag later.
+#
+# Only the platform's jobs run on the Talos runners, in the homelab, in the
+# runner group rg-talos: it admits the platform's workflows at the refs it lists,
+# nothing of this repository. Their labels match the lab's runners too, but
+# rg-talos-lab does not admit this repository. The build runs on GitHub's
+# runners. Nothing here starts on a pull request either: in a public repository,
+# a fork could open one.
+name: Evidence
+
+on:
+  push:
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v6.0.2
+        with:
+          go-version-file: go.mod
+          # No go.sum: there is nothing to cache.
+          cache: false
+
+      - name: Test
+        run: go test ./...
+
+      # -trimpath and an empty build id: the same commit and Go version give the same bytes.
+      - name: Build binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+            go build -trimpath -ldflags="-s -w -buildid=" -o "$RUNNER_TEMP/hello-world" ./cmd/hello-world
+
+      - name: Hand the binary over
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: hello-world-binary
+          path: ${{ runner.temp }}/hello-world
+          if-no-files-found: error
+
+      - name: Describe what was handed over
+        run: |
+          binary="$RUNNER_TEMP/hello-world"
+          sha256=$(sha256sum "$binary" | cut -d' ' -f1)
+          size=$(stat -c %s "$binary")
+          echo "hello-world: $size bytes, sha256:$sha256"
+          {
+            echo "### Built: hello-world"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Toolchain | $(go version | tr -d '|\`') |"
+            echo "| Handed over | \`hello-world\`, linux/amd64, $size bytes |"
+            echo "| SHA-256 | \`$sha256\`. The platform computes it again from what it downloads |"
+          } >>"$GITHUB_STEP_SUMMARY"
+
+  evidence:
+    name: Evidence
+    needs: build
+    # One call per evidence type: each gets its own runners, log and summary, and a
+    # type that fails stops no other. Attestation and signing first, the scanners later.
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [provenance, provenance-attestation]
+    uses: Depthmark-Lab/test-evidences/.github/workflows/evidence.yml@feature/external-consumer
+    # Everything any job of evidence.yml asks for: GitHub checks a called workflow's
+    # permissions before any job runs, whichever type this call is for.
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
+      attestations: write
+    with:
+      type: ${{ matrix.type }}
+      subject-repo-path: lab-artifacts/hello-world/${{ github.run_number }}/hello-world
+      subject-artifact: hello-world-binary
+      runs-on: '["self-hosted", "talos"]'
+
+  verify:
+    name: Verify
+    needs: [build, evidence]
+    # Also when a type failed: verify then says which envelopes hold and which type is missing.
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    uses: Depthmark-Lab/test-evidences/.github/workflows/verify.yml@feature/external-consumer
+    permissions:
+      contents: read
+    with:
+      subject-artifact: hello-world-binary
+      types: provenance,provenance-attestation
+      runs-on: '["self-hosted", "talos"]'
